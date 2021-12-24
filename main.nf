@@ -5,10 +5,9 @@ nextflow.preview.recursion=true
 
 include { simulate_variants } from './modules/simulate_outbreak.nf'
 include { simulate_reads } from './modules/simulate_outbreak.nf'
-include { select_ancestor } from './modules/simulate_outbreak.nf'
 
 
-workflow mutate_and_select {
+workflow select_and_mutate {
   take:
     ch_ref
 
@@ -21,10 +20,8 @@ workflow mutate_and_select {
 }
 
 workflow {
-  ref = file(params.ref)
+  inputs_ch = channel.fromList( [file(params.ref)] * params.iterations )
 
   main:
-    mutate_and_select.recurse(ref).times(params.iterations).view()
-    
-    
+    select_and_mutate.scan(inputs_ch).view()
 }

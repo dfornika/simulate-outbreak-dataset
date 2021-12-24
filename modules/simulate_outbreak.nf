@@ -2,7 +2,7 @@ process simulate_variants {
 
   tag { prefix + ' / ' + num_snps }
 
-  publishDir "${params.outdir}", pattern: "${prefix}.{fa,vcf,variants.tsv}", mode: 'copy'
+  publishDir "${params.outdir}/${prefix}", pattern: "${prefix}*.{fa,vcf,tsv,csv}", mode: 'copy'
 
   input:
     path(seq)
@@ -11,6 +11,7 @@ process simulate_variants {
     path("*.fa"), emit: seq
     path("*.fasta"), emit: selected
     tuple path("${prefix}.vcf"), path("${prefix}.variants.tsv"), emit: variants
+    path("${prefix}_mutation_info.csv"), emit: mutation_info
 
   script:
   def generator = { String alphabet, int n ->
@@ -22,15 +23,14 @@ process simulate_variants {
   num_snps = Math.abs(new Random().nextInt() % params.max_snps_per_iteration.toInteger() + params.min_snps_per_iteration.toInteger())
   """
   cp \$(ls -1 *.fa | sort -R | head -n 1) selected.fasta
+  echo 'parent_id,num_snps' > ${prefix}_mutation_info.csv
+  echo \$(head -n 1 selected.fasta | tr -d '>' | cut -d ' ' -f 1),${num_snps} >> ${prefix}_mutation_info.csv
   simuG -refseq selected.fasta -snp_count ${num_snps} -prefix ${prefix}
   mv ${prefix}.simseq.genome.fa ${prefix}.fa
   sed -i '/^>/!s/.\\{70\\}/&\\n/g' ${prefix}.fa
   sed -i 's/^>.*/>${prefix}/g' ${prefix}.fa
   mv ${prefix}.refseq2simseq.map.txt ${prefix}.variants.tsv
   mv ${prefix}.refseq2simseq.SNP.vcf ${prefix}.vcf
-  for f in *.fa; do
-    if [[ -L \$f ]]; then cp \$f \$(basename \$f .fa)_.fa; fi
-  done
   """
 }
 
