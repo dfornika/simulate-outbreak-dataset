@@ -23,5 +23,5 @@ workflow {
   inputs_ch = channel.fromList( [file(params.ref)] * params.iterations )
 
   main:
-    select_and_mutate.scan(inputs_ch).view()
+    select_and_mutate.scan(inputs_ch)
 }

@@ -38,7 +38,7 @@ process simulate_reads {
 
     tag { seq_id }
 
-    publishDir "${params.outdir}", pattern: "${seq_id}_R{1,2}.fastq.gz", mode: 'copy'
+    publishDir "${params.outdir}/${seq_id}", pattern: "${seq_id}_R{1,2}.fastq.gz", mode: 'copy'
 
     input:
     path(seq)
