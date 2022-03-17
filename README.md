@@ -40,7 +40,8 @@ Several parameters are available to control the outbreak simulation.
 | `max_snps_per_iteration` | Maximum number of SNPs to introduce during mutation phase.         | 20      |
 
 ## Outputs
-
+An output directory will be created using the filename of the initial reference genome (excluding the file extension).
+For each derived genome, a separate directory will be created, using a 4-character randomly generated identifier.
 
 ```
 output
